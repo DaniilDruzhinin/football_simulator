@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Команды</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js" defer></script>
+</head>
+<body>
+    <h1>🏢 Команды АПЛ</h1>
+    <nav><a href="/">← На главную</a> | <a href="/players">Игроки</a> | <a href="/league">Чемпионат</a></nav>
+    <table class="sortable">
+        <thead>
+            <tr>
+                <th>ID</th><th>Название</th><th>Город</th><th>Стадион</th><th>Игроков</th>
+                <th>Ср. рейтинг основы</th><th>Ср. возраст основы</th><th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for team in teams %}
+            <tr>
+                <td>{{ team.id }}</td>
+                <td>{{ team.name }}</td>
+                <td>{{ team.city }}</td>
+                <td>{{ team.stadium }}</td>
+                <td>{{ team.players|length }}</td>
+                <td>{{ lineup_stats[team.id].avg_rating if lineup_stats[team.id] else '-' }}</td>
+                <td>{{ lineup_stats[team.id].avg_age if lineup_stats[team.id] else '-' }}</td>
+                <td><a href="/team/{{ team.id }}">Состав</a></td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

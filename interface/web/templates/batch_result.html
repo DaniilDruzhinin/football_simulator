@@ -1,0 +1,9 @@
+{% if batch_stats %}
+<div class="batch-result">
+    <h3>Результаты {{ n_sim|default(0) }} матчей</h3>
+    <p>Средние голы: {{ batch_stats.avg_home_goals|default(0)|round(2) }} - {{ batch_stats.avg_away_goals|default(0)|round(2) }}</p>
+    <p>Победы хозяев: <span style="color: green;">{{ batch_stats.home_wins|default(0) }} ({{ batch_stats.home_wins_pct|default(0)|round(1) }}%)</span></p>
+    <p>Ничьи: <span style="color: orange;">{{ batch_stats.draws|default(0) }} ({{ batch_stats.draws_pct|default(0)|round(1) }}%)</span></p>
+    <p>Победы гостей: <span style="color: red;">{{ batch_stats.away_wins|default(0) }} ({{ batch_stats.away_wins_pct|default(0)|round(1) }}%)</span></p>
+</div>
+{% endif %}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Игроки</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js" defer></script>
+</head>
+<body>
+    <h1>👥 Все игроки ({{ count }})</h1>
+    <nav><a href="/">← На главную</a> | <a href="/teams">Команды</a> | <a href="/league">Чемпионат</a></nav>
+    {% if message %}
+        <div class="message">{{ message }}</div>
+    {% endif %}
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post" action="/generate" class="generate-form">
+        <label>Количество игроков:</label>
+        <input type="number" name="count" value="{{ last_count|default(10) }}" min="1" max="500">
+        <label>Команда:</label>
+        <select name="team_id">
+            <option value="random" {% if last_team_id == 'random' %}selected{% endif %}>Случайное распределение</option>
+            {% for team in teams %}
+                <option value="{{ team.id }}" {% if last_team_id == team.id|string %}selected{% endif %}>{{ team.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Сгенерировать</button>
+    </form>
+
+    <!-- Форма удаления с исправленным action -->
+    <form method="post" action="/delete" class="generate-form" onsubmit="return confirm('Вы уверены?')">
+        <label>Удалить игроков:</label>
+        <select name="scope" id="delete-scope">
+            <option value="all">Всех</option>
+            <option value="team">Из команды</option>
+        </select>
+        <select name="team_id" id="delete-team-select">
+            <option value="">-- выберите команду --</option>
+            {% for team in teams %}
+                <option value="{{ team.id }}">{{ team.name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit" style="background-color: #e74c3c;">Удалить</button>
+    </form>
+
+    <table class="sortable">
+        <thead>
+            <tr>
+                <th>ID</th><th>Имя</th><th>Нация</th><th>Возраст</th><th>Позиция</th><th>Рейтинг</th><th>Exp</th><th>Потенциал</th><th>Команда</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in players %}
+            <tr>
+                <td>{{ p.id }}</td>
+                <td>{{ p.full_name() }}</td>
+                <td>{{ p.nation }}</td>
+                <td data-sort-value="{{ p.age_days(reference_date) }}">{{ p.age_str(reference_date) }}</td>
+                <td>{{ p.position.name }}</td>
+                <td>{{ p.rating_int() }}</td>
+                <td>
+                    <div class="exp-bar"><div class="exp-fill" style="width:{{ p.exp_pct() }}%"></div></div>
+                </td>
+                <td>{{ p.potential_display() }}</td>
+                <td>
+                    {% if p.team_id %}
+                        {% for t in teams %}
+                            {% if t.id == p.team_id %}{{ t.name }}{% endif %}
+                        {% endfor %}
+                    {% else %}
+                        -
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <script>
+        // Показывать/скрывать выбор команды в зависимости от scope
+        document.getElementById('delete-scope').addEventListener('change', function() {
+            const teamSelect = document.getElementById('delete-team-select');
+            if (this.value === 'team') {
+                teamSelect.style.display = 'inline';
+                teamSelect.required = true;
+            } else {
+                teamSelect.style.display = 'none';
+                teamSelect.required = false;
+            }
+        });
+        // Инициализация
+        window.addEventListener('load', function() {
+            const scope = document.getElementById('delete-scope');
+            const teamSelect = document.getElementById('delete-team-select');
+            if (scope.value === 'team') {
+                teamSelect.style.display = 'inline';
+                teamSelect.required = true;
+            } else {
+                teamSelect.style.display = 'none';
+                teamSelect.required = false;
+            }
+        });
+    </script>
+</body>
+</html>

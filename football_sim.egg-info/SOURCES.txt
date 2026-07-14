@@ -1,0 +1,10 @@
+setup.py
+core/__init__.py
+core/engine/__init__.py
+core/entities/__init__.py
+core/generators/__init__.py
+core/utils/__init__.py
+football_sim.egg-info/PKG-INFO
+football_sim.egg-info/SOURCES.txt
+football_sim.egg-info/dependency_links.txt
+football_sim.egg-info/top_level.txt

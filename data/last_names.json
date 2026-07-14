@@ -1,0 +1,15 @@
+{
+  "Russia": ["Ivanov", "Petrov", "Smirnov", "Kuznetsov", "Popov", "Dudchenko", "Druzhinin", "Sokolov", "Volkov", "Morozov", "Novikov", "Kozlov"],
+  "Brazil": ["Silva", "Santos", "Oliveira", "Souza", "Pereira", "Lima", "Costa", "Ferreira", "Rodrigues", "Almeida", "Nascimento", "Araujo"],
+  "Argentina": ["Messi", "Di Maria", "Martinez", "Alvarez", "Otamendi", "Romero", "Fernandez", "Acuna", "Tagliafico", "De Paul", "Paredes", "Lo Celso"],
+  "Germany": ["Neuer", "Muller", "Kroos", "Reus", "Kimmich", "Sane", "Havertz", "Wirtz", "Goretzka", "Gundogan", "Hummels", "Rudiger"],
+  "France": ["Mbappe", "Griezmann", "Pogba", "Varane", "Benzema", "Kante", "Lloris", "Dembele", "Giroud", "Hernandez", "Tchouameni", "Coman"],
+  "Spain": ["Ramos", "Iniesta", "Gonzalez", "Gavi", "Morata", "Rodri", "Olmo", "Asensio", "Torres", "Alba", "Carvajal", "Laporte"],
+  "Italy": ["Donnarumma", "Verratti", "Insigne", "Chiesa", "Barella", "Bonucci", "Immobile", "Jorginho", "Bastoni", "Tonali", "Darmian", "Pellegrini"],
+  "England": ["Smith", "Jones", "Williams", "Taylor", "Brown", "Kane", "Sterling", "Rashford", "Foden", "Rice", "Grealish", "Saka"],
+  "Netherlands": ["van Dijk", "Depay", "de Jong", "de Ligt", "Gakpo", "Dumfries", "Bergwijn", "Wijnaldum", "Gravenberch", "Blind", "Malen", "Timber"],
+  "Portugal": ["Ronaldo", "Fernandes", "Silva", "Dias", "Jota", "Leao", "Cancelo", "Mendes", "Neves", "Palhinha", "Vitinha", "Guerreiro"],
+  "Uruguay": ["Suarez", "Cavani", "Valverde", "Nunez", "Bentancur", "Godin", "Gimenez", "Torres", "Vecino", "Araujo", "Pellistri", "Vina"],
+  "Belgium": ["De Bruyne", "Hazard", "Lukaku", "Courtois", "Tielemans", "Witsel", "Mertens", "Vertonghen", "Alderweireld", "Castagne", "Batshuayi", "Vanaken"],
+  "Croatia": ["Modric", "Perisic", "Brozovic", "Kovacic", "Gvardiol", "Vlasic", "Mandzukic", "Kramaric", "Livaja", "Sosa", "Stanisic", "Orsic"]
+}

@@ -1,0 +1,15 @@
+{
+  "Russia": ["Ivan", "Dmitri", "Sergei", "Andrei", "Alexei", "Daniil", "Mikhail", "Nikolai", "Vladimir", "Artem", "Denis", "Pavel"],
+  "Brazil": ["Neymar", "Roberto", "Carlos", "Ronaldo", "Rivaldo", "Rafael", "Lucas", "Gabriel", "Felipe", "Marcos", "Thiago", "Bruno"],
+  "Argentina": ["Lionel", "Angel", "Gonzalo", "Paulo", "Julian", "Nicolas", "Leandro", "Emiliano", "Rodrigo", "Matias", "Juan", "Fernando"],
+  "Germany": ["Manuel", "Thomas", "Toni", "Marco", "Joshua", "Leroy", "Kai", "Florian", "Leon", "Jonas", "Niklas", "Felix"],
+  "France": ["Kylian", "Antoine", "Paul", "Raphael", "Karim", "N'Golo", "Hugo", "Ousmane", "Olivier", "Lucas", "Theo", "Adrien"],
+  "Spain": ["Sergio", "Andres", "Pedri", "Gavi", "Alvaro", "Rodri", "Dani", "Marco", "Pablo", "Carlos", "David", "Jordi"],
+  "Italy": ["Gianluigi", "Marco", "Lorenzo", "Federico", "Nicolo", "Sandro", "Ciro", "Jorginho", "Alessandro", "Francesco", "Matteo", "Simone"],
+  "England": ["Harry", "John", "Michael", "David", "James", "Jordan", "Raheem", "Marcus", "Phil", "Declan", "Jack", "Bukayo"],
+  "Netherlands": ["Virgil", "Memphis", "Frenkie", "Matthijs", "Cody", "Denzel", "Steven", "Georginio", "Ryan", "Daley", "Donny", "Jurrien"],
+  "Portugal": ["Cristiano", "Bruno", "Bernardo", "Ruben", "Diogo", "Rafael", "Joao", "Pedro", "Goncalo", "Nuno", "Andre", "Ricardo"],
+  "Uruguay": ["Luis", "Edinson", "Federico", "Darwin", "Rodrigo", "Giorgian", "Mathias", "Jose", "Santiago", "Maxi", "Agustin", "Cristian"],
+  "Belgium": ["Kevin", "Eden", "Romelu", "Thibaut", "Youri", "Axel", "Dries", "Jan", "Toby", "Leander", "Michy", "Hans"],
+  "Croatia": ["Luka", "Ivan", "Marcelo", "Mateo", "Josko", "Domagoj", "Mario", "Nikola", "Ante", "Borna", "Mislav", "Duje"]
+}

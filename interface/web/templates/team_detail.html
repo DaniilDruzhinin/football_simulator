@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>{{ team.name }} - Состав</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js" defer></script>
+</head>
+<body>
+    <h1>{{ team.name }}</h1>
+    <nav><a href="/teams">← К списку команд</a></nav>
+    <p>Город: {{ team.city }} | Стадион: {{ team.stadium }}</p>
+
+    <div class="stats">
+        <h3>Статистика команды</h3>
+        <p><strong>Все игроки:</strong> Средний рейтинг {{ all_stats.avg_rating }} (±{{ all_stats.std_rating }}), возраст {{ all_stats.avg_age }} (±{{ all_stats.std_age }})</p>
+        {% if lineup_available and best_formation %}
+            <p><strong>Основа ({{ best_formation }}):</strong> Средний рейтинг {{ lineup_stats.avg_rating }} (±{{ lineup_stats.std_rating }}), возраст {{ lineup_stats.avg_age }} (±{{ lineup_stats.std_age }})</p>
+        {% else %}
+            <p><em>Невозможно собрать ни один вариант состава.</em></p>
+        {% endif %}
+    </div>
+
+    {% if lineup_available and best_formation %}
+        <h2>Оптимальный состав ({{ best_formation }})</h2>
+        <table class="sortable">
+            <thead>
+                <tr>
+                    <th>Позиция</th><th>Имя</th><th>Рейтинг</th><th>Exp</th><th>Возраст</th><th>Нация</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for p in lineup %}
+                <tr>
+                    <td>{{ p.position.name }}</td>
+                    <td>{{ p.full_name() }}</td>
+                    <td>{{ p.rating_int() }}</td>
+                    <td>
+                        <div class="exp-bar"><div class="exp-fill" style="width:{{ p.exp_pct() }}%"></div></div>
+                    </td>
+                    <td data-sort-value="{{ p.age_days(reference_date) }}">{{ p.age_str(reference_date) }}</td>
+                    <td>{{ p.nation }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <div class="error">
+            <p>Ни одна тактическая схема не может быть собрана. Не хватает игроков нужных амплуа.</p>
+            {% if missing_list %}
+                <h3>Нехватки по схемам:</h3>
+                {% for item in missing_list %}
+                    <h4>{{ item.formation }}</h4>
+                    <ul>
+                    {% for group, count in item.missing.items() %}
+                        <li>{{ group }}: не хватает {{ count }}</li>
+                    {% endfor %}
+                    </ul>
+                {% endfor %}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% set lineup_ids = lineup | map(attribute='id') | list if lineup else [] %}
+
+    <h3>Все игроки ({{ team.players|length }})</h3>
+    <table class="sortable">
+        <thead>
+            <tr>
+                <th>ID</th><th>Имя</th><th>Позиция</th><th>Рейтинг</th><th>Exp</th><th>Потенциал</th><th>Возраст</th><th>Нация</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for p in team.players %}
+            <tr class="{% if p.id in lineup_ids %}highlight-lineup{% endif %}">
+                <td>{{ p.id }}</td>
+                <td>{{ p.full_name() }}</td>
+                <td>{{ p.position.name }}</td>
+                <td>{{ p.rating_int() }}</td>
+                <td>
+                    <div class="exp-bar"><div class="exp-fill" style="width:{{ p.exp_pct() }}%"></div></div>
+                </td>
+                <td>{{ p.potential_display() }}</td>
+                <td data-sort-value="{{ p.age_days(reference_date) }}">{{ p.age_str(reference_date) }}</td>
+                <td>{{ p.nation }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

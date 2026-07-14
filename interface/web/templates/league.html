@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Чемпионат</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        .league-table th, .league-table td { text-align: center; padding: 6px 10px; }
+        .arrow-up { color: green; font-weight: bold; }
+        .arrow-down { color: red; font-weight: bold; }
+        .arrow-none { color: gray; }
+        .match-list { margin-top: 30px; }
+        .match-row { border-bottom: 1px solid #ddd; padding: 8px; }
+        .score-col { font-weight: bold; text-align: center; }
+        .team-col { flex: 1; }
+        .home { text-align: right; }
+        .away { text-align: left; }
+        .controls { margin: 10px 0; }
+        .tour-nav { display: flex; align-items: center; gap: 15px; margin: 15px 0; }
+        .tour-nav a { text-decoration: none; font-size: 1.5em; }
+        .tour-nav .disabled { visibility: hidden; }
+        .season-selector { margin-bottom: 20px; }
+        .form-circles { display: flex; gap: 3px; justify-content: center; }
+        .form-circle { width: 12px; height: 12px; border-radius: 50%; border: 1px solid #ccc; }
+        .form-W { background: green; }
+        .form-D { background: yellow; }
+        .form-L { background: red; }
+        .form-empty { background: white; }
+        .match-row { display: flex; align-items: center; padding: 5px 0; border-bottom: 1px solid #ddd; }
+        .team-col { flex: 1; }
+        .home { text-align: right; padding-right: 15px; }
+        .away { text-align: left; padding-left: 15px; }
+        .score-col {  flex: 0 0 auto; min-width: 60px; text-align: center; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>🏆 Чемпионат</h1>
+    <nav>
+        <a href="/">← На главную</a> | 
+        <a href="/teams">Команды</a> | 
+        <a href="/players">Игроки</a>
+    </nav>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="season-selector">
+        <form method="get" action="/league">
+            <label>Сезон для просмотра:</label>
+            <select name="season_id" onchange="this.form.submit()">
+                <option value="">-- активный --</option>
+                {% for s in seasons %}
+                    <option value="{{ s.id }}" {% if selected_season_id == s.id %}selected{% endif %}>{{ s.id }}</option>
+                {% endfor %}
+            </select>
+        </form>
+    </div>
+
+    {% if not league_started %}
+        <p>Чемпионат ещё не начат. Убедитесь, что у всех команд есть основной состав 4-4-2.</p>
+        {% if can_start %}
+            <form method="post" action="/league/start_new_season">
+                <button type="submit">Начать новый сезон</button>
+            </form>
+        {% else %}
+            <p style="color: red;">Не все команды укомплектованы. Доберите игроков.</p>
+        {% endif %}
+    {% else %}
+        <div class="tour-info">
+            Сезон: {{ active_season.id }} |
+            Сыграно туров: {{ current_tour }} из {{ total_tours }}
+            {% if finished %}(Завершён){% endif %}
+        </div>
+
+        <div class="tour-nav">
+            <a href="?season_id={{ active_season.id }}&tour={{ view_tour - 1 }}" 
+               {% if view_tour <= 0 %}class="disabled"{% endif %}>◀</a>
+            <span>Тур {{ view_tour }} {% if view_tour_date %} – {{ view_tour_date }}{% endif %}</span>
+            <a href="?season_id={{ active_season.id }}&tour={{ view_tour + 1 }}" 
+               {% if view_tour >= current_tour %}class="disabled"{% endif %}>▶</a>
+        </div>
+
+        {% if view_tour > 0 and matches %}
+        <div class="match-list">
+            <h3>Результаты тура {{ view_tour }}</h3>
+            {% for m in matches %}
+                {% set home_name = teams | selectattr("id", "equalto", m.home) | map(attribute="name") | first %}
+                {% set away_name = teams | selectattr("id", "equalto", m.away) | map(attribute="name") | first %}
+                <div class="match-row">
+                    <span class="team-col home">{{ home_name }}</span>
+                    <span class="score-col">{{ m.home_goals }} : {{ m.away_goals }}</span>
+                    <span class="team-col away">{{ away_name }}</span>
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h2>Турнирная таблица после {{ view_tour }} тура</h2>
+        <table class="sortable league-table">
+            <thead>
+                <tr>
+                    <th>Место</th><th>Изм.</th><th>Команда</th><th>И</th><th>В</th><th>Н</th><th>П</th>
+                    <th>Мячи</th><th>Очки</th>
+                    {% if not finished and view_tour == current_tour %}<th>След. соперник</th>{% endif %}
+                    <th>Форма</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in table %}
+                <tr>
+                    <td>{{ row.position }}</td>
+                    <td>
+                        {% if row.position_change > 0 %}<span class="arrow-up">▲{{ row.position_change }}</span>
+                        {% elif row.position_change < 0 %}<span class="arrow-down">▼{{ -row.position_change }}</span>
+                        {% else %}<span class="arrow-none">–</span>{% endif %}
+                    </td>
+                    <td>{{ row.name }}</td>
+                    <td>{{ row.played }}</td>
+                    <td>{{ row.wins }}</td>
+                    <td>{{ row.draws }}</td>
+                    <td>{{ row.losses }}</td>
+                    <td>{{ row.goals_for }}-{{ row.goals_against }} ({{ row.goals_for - row.goals_against }})</td>
+                    <td><strong>{{ row.points }}</strong></td>
+                    {% if not finished and view_tour == current_tour %}
+                        <td>{{ next_match_info.get(row.id, '') }}</td>
+                    {% endif %}
+                    <td>
+                        <div class="form-circles">
+                            {% for res in row.form %}
+                                <div class="form-circle form-{{ res if res else 'empty' }}"></div>
+                            {% endfor %}
+                        </div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {% if not finished and view_tour == current_tour %}
+        <div class="controls">
+            <form method="post" action="/league/next_tour">
+                <button type="submit">Симулировать следующий тур</button>
+            </form>
+        </div>
+        {% endif %}
+
+        {% if can_start_new %}
+        <div style="margin-top:20px;">
+            <form method="post" action="/league/start_new_season">
+                <button type="submit" style="background:#27ae60;">Начать новый сезон</button>
+            </form>
+        </div>
+        {% endif %}
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Симуляция матча</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>🏟️ Симуляция матча</h1>
+    <nav><a href="/">← На главную</a> | <a href="/teams">Команды</a></nav>
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    <div class="team-stats">
+        <p><span id="home-team-name"></span>: <span id="home-stats"></span></p>
+        <p><span id="away-team-name"></span>: <span id="away-stats"></span></p>
+    </div>
+
+    <script>
+        const teamsStats = {{ teams_stats_json | safe }};
+        const teamsData = {{ teams_data_json | safe }};
+
+        function updateStats() {
+            const homeSelect = document.querySelector('select[name="home_team_id"]');
+            const awaySelect = document.querySelector('select[name="away_team_id"]');
+            const homeId = parseInt(homeSelect.value);
+            const awayId = parseInt(awaySelect.value);
+
+            // Обновляем названия команд
+            const homeTeam = teamsData.find(t => t.id === homeId);
+            const awayTeam = teamsData.find(t => t.id === awayId);
+            document.getElementById('home-team-name').textContent = homeTeam ? homeTeam.name : '';
+            document.getElementById('away-team-name').textContent = awayTeam ? awayTeam.name : '';
+
+            const homeStats = teamsStats[homeId];
+            const awayStats = teamsStats[awayId];
+            document.getElementById('home-stats').innerHTML = homeStats 
+                ? `Рейтинг ${homeStats.avg_rating} (±${homeStats.std_rating})` 
+                : 'Нет данных';
+            document.getElementById('away-stats').innerHTML = awayStats 
+                ? `Рейтинг ${awayStats.avg_rating} (±${awayStats.std_rating})` 
+                : 'Нет данных';
+        }
+
+        window.addEventListener('load', function() {
+            const homeSelect = document.querySelector('select[name="home_team_id"]');
+            const awaySelect = document.querySelector('select[name="away_team_id"]');
+            homeSelect.addEventListener('change', updateStats);
+            awaySelect.addEventListener('change', updateStats);
+            updateStats();
+        });
+    </script>
+
+    {% if result %}
+        <div class="result">
+            <h2>{{ result.home_team }} {{ result.home_goals }} : {{ result.away_goals }} {{ result.away_team }}</h2>
+            <details>
+                <summary>Состав {{ result.home_team }}</summary>
+                <ul>
+                {% for p in result.home_lineup %}
+                    <li>{{ p.pos }} - {{ p.name }} ({{ p.rating }})</li>
+                {% endfor %}
+                </ul>
+            </details>
+            <details>
+                <summary>Состав {{ result.away_team }}</summary>
+                <ul>
+                {% for p in result.away_lineup %}
+                    <li>{{ p.pos }} - {{ p.name }} ({{ p.rating }})</li>
+                {% endfor %}
+                </ul>
+            </details>
+        </div>
+    {% endif %}
+
+    <form method="post" action="/simulate" class="simulate-form">
+        <label>Хозяева:</label>
+        <select name="home_team_id" required>
+            {% for team in teams %}
+                <option value="{{ team.id }}" {% if selected_home == team.id %}selected{% endif %}>{{ team.name }} ({{ team.players|length }} игр.)</option>
+            {% endfor %}
+        </select>
+        <label>Гости:</label>
+        <select name="away_team_id" required>
+            {% for team in teams %}
+                <option value="{{ team.id }}" {% if selected_away == team.id %}selected{% endif %}>{{ team.name }} ({{ team.players|length }} игр.)</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Симулировать</button>
+    </form>
+    
+    <div style="margin-top: 20px;">
+        <label>Количество матчей для серии:</label>
+        <input type="number" id="batch-n" value="100" min="1" max="1000">
+        <button type="button" id="batch-simulate">Симулировать серию</button>
+    </div>
+    <div id="batch-result"></div>
+
+    <script>
+        document.getElementById('batch-simulate').addEventListener('click', async () => {
+            const homeId = document.querySelector('select[name="home_team_id"]').value;
+            const awayId = document.querySelector('select[name="away_team_id"]').value;
+            const n = document.getElementById('batch-n').value;
+            const formData = new FormData();
+            formData.append('home_team_id', homeId);
+            formData.append('away_team_id', awayId);
+            formData.append('n', n);
+            const response = await fetch('/simulate_batch', {
+                method: 'POST',
+                body: formData
+            });
+            const html = await response.text();
+            document.getElementById('batch-result').innerHTML = html;
+            if (typeof updateStats === 'function') {
+                updateStats();
+            }
+        });
+    </script>
+
+    {% if batch_stats %}
+    <div class="batch-result">
+        <h3>Результаты {{ n_sim|default(0) }} матчей</h3>
+        <p>Средние голы: {{ batch_stats.avg_home_goals|default(0)|round(2) }} - {{ batch_stats.avg_away_goals|default(0)|round(2) }}</p>
+        <p>Победы хозяев: <span style="color: green;">{{ batch_stats.home_wins|default(0) }} ({{ batch_stats.home_wins_pct|default(0)|round(1) }}%)</span></p>
+        <p>Ничьи: <span style="color: orange;">{{ batch_stats.draws|default(0) }} ({{ batch_stats.draws_pct|default(0)|round(1) }}%)</span></p>
+        <p>Победы гостей: <span style="color: red;">{{ batch_stats.away_wins|default(0) }} ({{ batch_stats.away_wins_pct|default(0)|round(1) }}%)</span></p>
+    </div>
+    {% endif %}
+</body>
+</html>
